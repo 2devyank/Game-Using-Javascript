@@ -4,5 +4,5 @@
 ### Game will be started by pressing Enter
 ### With Left key paddle will move Left
 ###  With Right key paddle will move Right
-### Game can be paused by Spacebar 
+### Game can be pause by Spacebar 
 ### User will have only two lives after that game will be Over
