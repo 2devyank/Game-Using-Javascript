@@ -1,2 +1,2 @@
-## Game-Using-Javascript
+# Game-Using-Javascript
 ##
