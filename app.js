@@ -1,5 +1,29 @@
 // import Paddle from "/src/PADDLE.JS";
 // paddle
+function music(){
+
+
+var audio=new Audio("sound.wav");
+// audio.setAttribute('src','sound.wav');
+// audio.loop=true;
+audio.play();
+};
+// function musicstart(){
+
+
+    // var audio=new Audio("start.wav");
+    // audio.setAttribute('src','sound.wav');
+    // audio.loop=true;
+    // audio.play();
+    // };
+    // function musicend(){
+
+
+    //     var audio=new Audio("back.wav");
+    //     // audio.setAttribute('src','sound.wav');
+    //     // audio.loop=true;
+        // audio.play();
+        // };
 class Paddle {
 
 
@@ -58,7 +82,8 @@ const gamestate = {
     paused: 0,
     running: 1,
     menu: 2,
-    gameover: 3
+    gameover: 3,
+    newlevel:4
 };
 //Input Handler
 class InputHandler {
@@ -193,6 +218,7 @@ class Brick {
         if (collisoinDetection(this.game.ball, this)) {
             this.game.ball.speed.y = -this.game.ball.speed.y;
             this.mark = true;
+          setInterval( music(),80 );  
         }
     }
 
@@ -283,6 +309,9 @@ class Game {
         this.gameobjects=[];
         this.ball = new Ball(this);
         new InputHandler(this.paddle, this);
+        this.bricks=[];
+        this.levels=[level1,level2];
+        this.curindex=0;
         // let paddle = new Paddle(this);
 
         // let ball = new Ball(this);
@@ -291,7 +320,7 @@ class Game {
 
     }
     start() {
-if(this.gamestate!==gamestate.menu)return;
+if(this.gamestate!==gamestate.menu && this.gamestate!==gamestate.newlevel)return;
 
         // let bricks=[];
         // for(let i=0;i<10;i++){
@@ -299,22 +328,33 @@ if(this.gamestate!==gamestate.menu)return;
         // }
         // let bricks=new Brick(this, { x:20 , y:20 });
 
-        let bricks = buildlevel(this, level1);
-
-        this.gameobjects = [this.paddle, this.ball, ...bricks];
+        this.bricks = buildlevel(this, this.levels[this.curindex]);
+this.ball.reset();
+        this.gameobjects = [this.paddle, this.ball];
 
        this.gamestate= gamestate.running;
     }
 
 
     update(deltatime) {
-        if(this.lives===0) this.gamestate=gamestate.gameover;
+        if(this.lives===0){this.gamestate=gamestate.gameover; 
+            // setInterval( musicend(),100000);
+            // musicend();
+           // this.gamestate = gamestate.menu;
+        }
+
+        
 
         if (this.gamestate === gamestate.paused || this.gamestate === gamestate.menu ||this.gamestate === gamestate.gameover) return;
+        if(this.bricks.length===0){
+            
+            this.curindex++;
+            this.gamestate=gamestate.newlevel;
+            this.start();
+        }
+        [...this.gameobjects,...this.bricks].forEach(objects => objects.update(deltatime));
 
-        this.gameobjects.forEach(objects => objects.update(deltatime));
-
-        this.gameobjects = this.gameobjects.filter(object => !object.mark);
+        this.bricks= this.bricks.filter(brick => !brick.mark);
 
     }
 
@@ -322,7 +362,7 @@ if(this.gamestate!==gamestate.menu)return;
 
     draw(ctx) {
 
-        this.gameobjects.forEach(objects => objects.draw(ctx));
+       [...this.gameobjects,...this.bricks].forEach(objects => objects.draw(ctx));
 
         if (this.gamestate == gamestate.paused) {
             ctx.rect(0, 0, this.gameWidth, this.gameHeight);
@@ -418,7 +458,11 @@ function buildlevel(game, level) {
 
 
 const level1 = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, , , ,,,,1]
+    
+];
+const level2 = [
+    [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
